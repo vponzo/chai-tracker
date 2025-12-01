@@ -62,4 +62,489 @@
         }
         .menu-grid {
             display: grid;
-            grid-template-columns: re
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .menu-btn {
+            background: #fed7aa;
+            border: none;
+            padding: 40px 20px;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #9a3412;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .menu-btn:hover { background: #fdba74; transform: translateY(-2px); }
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .field input, .field select, .field textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .field textarea { resize: vertical; }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .back-btn:hover { color: #374151; }
+        .submit-btn {
+            width: 100%;
+            background: #ea580c;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .submit-btn:hover { background: #c2410c; }
+        .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        .fill-prev-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+        }
+        .fill-prev-btn:hover { background: #e5e7eb; }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐕 Chai's Health Tracker</h1>
+            <p>Track Chai's diet, medication, and health observations</p>
+        </div>
+
+        <a class="setup-toggle" onclick="toggleSetup()">⚙️ Configure Google Sheets URL</a>
+
+        <div id="setupSection" class="setup hidden">
+            <h2>Setup</h2>
+            <p style="color: #1e40af; font-size: 14px; margin-bottom: 15px;">
+                Enter your Google Apps Script web app URL:
+            </p>
+            <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+        </div>
+
+        <div id="statusMessage" class="hidden"></div>
+
+        <!-- Entry Info (always visible) -->
+        <div class="card" style="margin-bottom: 20px;">
+            <h2 style="margin-bottom: 20px;">Entry Information</h2>
+            <div class="form-group">
+                <div class="field">
+                    <label>Date *</label>
+                    <input type="date" id="entryDate">
+                </div>
+                <div class="field">
+                    <label>Entered By *</label>
+                    <select id="enteredBy">
+                        <option value="">Select...</option>
+                        <option value="Vince">Vince</option>
+                        <option value="Preeti">Preeti</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu View -->
+        <div id="menuView" class="card">
+            <h2 style="margin-bottom: 20px;">What would you like to track?</h2>
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="showView('food')">🍖 Food</button>
+                <button class="menu-btn" onclick="showView('snack')">🦴 Snack</button>
+                <button class="menu-btn" onclick="showView('medication')">💊 Medication</button>
+                <button class="menu-btn" onclick="showView('poop')">💩 Poop</button>
+                <button class="menu-btn" onclick="showView('vomit')">🤢 Vomit</button>
+                <button class="menu-btn" onclick="showView('observation')">📝 Observation</button>
+            </div>
+        </div>
+
+        <!-- Food View -->
+        <div id="foodView" class="card hidden">
+            <div class="section-header">
+                <span class="back-btn" onclick="showView('menu')">← Back to Menu</span>
+                <button class="fill-prev-btn" onclick="fillPrevious('food')" id="fillPrevFood" style="display:none;">Fill Previous</button>
+            </div>
+            <h2 style="margin-bottom: 20px;">🍖 Log Food</h2>
+            <div class="form-group">
+                <div class="field">
+                    <label>Time</label>
+                    <input type="time" id="foodTime">
+                </div>
+                <div class="field">
+                    <label>Ingredients</label>
+                    <input type="text" id="foodIngredients" placeholder="e.g., chicken, rice, carrots">
+                </div>
+                <div class="field">
+                    <label>Brand</label>
+                    <input type="text" id="foodBrand">
+                </div>
+                <div class="field">
+                    <label>Amount (oz)</label>
+                    <input type="text" id="foodAmount" placeholder="e.g., 8">
+                </div>
+                <div class="field">
+                    <label>Probiotic</label>
+                    <select id="foodProbiotic">
+                        <option value="">Select...</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+            </div>
+            <button class="submit-btn" onclick="submitEntry('food')">Log Food Entry</button>
+        </div>
+
+        <!-- Snack View -->
+        <div id="snackView" class="card hidden">
+            <div class="section-header">
+                <span class="back-btn" onclick="showView('menu')">← Back to Menu</span>
+                <button class="fill-prev-btn" onclick="fillPrevious('snack')" id="fillPrevSnack" style="display:none;">Fill Previous</button>
+            </div>
+            <h2 style="margin-bottom: 20px;">🦴 Log Snack</h2>
+            <div class="form-group">
+                <div class="field">
+                    <label>Time</label>
+                    <input type="time" id="snackTime">
+                </div>
+                <div class="field">
+                    <label>Ingredients</label>
+                    <input type="text" id="snackIngredients" placeholder="e.g., beef, sweet potato">
+                </div>
+                <div class="field">
+                    <label>Brand</label>
+                    <input type="text" id="snackBrand">
+                </div>
+                <div class="field">
+                    <label>Amount (oz)</label>
+                    <input type="text" id="snackAmount" placeholder="e.g., 2">
+                </div>
+            </div>
+            <button class="submit-btn" onclick="submitEntry('snack')">Log Snack Entry</button>
+        </div>
+
+        <!-- Medication View -->
+        <div id="medicationView" class="card hidden">
+            <div class="section-header">
+                <span class="back-btn" onclick="showView('menu')">← Back to Menu</span>
+                <button class="fill-prev-btn" onclick="fillPrevious('medication')" id="fillPrevMedication" style="display:none;">Fill Previous</button>
+            </div>
+            <h2 style="margin-bottom: 20px;">💊 Log Medication</h2>
+            <div class="form-group">
+                <div class="field">
+                    <label>Time</label>
+                    <input type="time" id="medicationTime">
+                </div>
+                <div class="field">
+                    <label>Medication Name</label>
+                    <select id="medicationName" onchange="toggleOtherMed()">
+                        <option value="">Select...</option>
+                        <option value="Omeprazole">Omeprazole</option>
+                        <option value="Metronidazole">Metronidazole</option>
+                        <option value="Pro-Pectalin">Pro-Pectalin</option>
+                        <option value="Ondansetron">Ondansetron</option>
+                        <option value="Trazadone">Trazadone</option>
+                        <option value="HeartGuard">HeartGuard</option>
+                        <option value="NextGuard">NextGuard</option>
+                        <option value="Sucralfate">Sucralfate</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="field hidden" id="otherMedField">
+                    <label>Other Medication Name</label>
+                    <input type="text" id="medicationOther" placeholder="Enter medication name">
+                </div>
+                <div class="field">
+                    <label>Amount</label>
+                    <input type="text" id="medicationAmount" placeholder="e.g., 1 tablet, 5ml">
+                </div>
+            </div>
+            <button class="submit-btn" onclick="submitEntry('medication')">Log Medication Entry</button>
+        </div>
+
+        <!-- Poop View -->
+        <div id="poopView" class="card hidden">
+            <div class="section-header">
+                <span class="back-btn" onclick="showView('menu')">← Back to Menu</span>
+                <button class="fill-prev-btn" onclick="fillPrevious('poop')" id="fillPrevPoop" style="display:none;">Fill Previous</button>
+            </div>
+            <h2 style="margin-bottom: 20px;">💩 Log Poop</h2>
+            <div class="form-group">
+                <div class="field">
+                    <label>Time</label>
+                    <input type="time" id="poopTime">
+                </div>
+                <div class="field">
+                    <label>Amount</label>
+                    <input type="text" id="poopAmount" placeholder="e.g., small, medium, large">
+                </div>
+                <div class="field">
+                    <label>Consistency</label>
+                    <select id="poopConsistency">
+                        <option value="">Select...</option>
+                        <option value="Firm/Normal">Firm/Normal</option>
+                        <option value="Soft">Soft</option>
+                        <option value="Loose">Loose</option>
+                        <option value="Diarrhea">Diarrhea</option>
+                        <option value="Hard/Dry">Hard/Dry</option>
+                    </select>
+                </div>
+            </div>
+            <button class="submit-btn" onclick="submitEntry('poop')">Log Poop Entry</button>
+        </div>
+
+        <!-- Vomit View -->
+        <div id="vomitView" class="card hidden">
+            <span class="back-btn" onclick="showView('menu')">← Back to Menu</span>
+            <h2 style="margin: 20px 0;">🤢 Log Vomit</h2>
+            <div class="field">
+                <label>Did Chai vomit?</label>
+                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="vomit" value="Yes"> Yes
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="vomit" value="No"> No
+                    </label>
+                </div>
+            </div>
+            <button class="submit-btn" onclick="submitEntry('vomit')" style="margin-top: 20px;">Log Vomit Entry</button>
+        </div>
+
+        <!-- Observation View -->
+        <div id="observationView" class="card hidden">
+            <span class="back-btn" onclick="showView('menu')">← Back to Menu</span>
+            <h2 style="margin: 20px 0;">📝 Log Observation</h2>
+            <div class="field">
+                <label>General Observations</label>
+                <textarea id="observations" rows="6" placeholder="Any notes about Chai's behavior, energy level, or health..."></textarea>
+            </div>
+            <button class="submit-btn" onclick="submitEntry('observation')">Log Observation</button>
+        </div>
+    </div>
+
+    <script>
+        let lastEntry = null;
+        
+        // Set today's date on load
+        document.getElementById('entryDate').valueAsDate = new Date();
+
+        // Load saved script URL from localStorage
+        window.addEventListener('load', function() {
+            const savedUrl = localStorage.getItem('chaiTrackerScriptUrl');
+            if (savedUrl) {
+                document.getElementById('scriptUrl').value = savedUrl;
+            }
+        });
+
+        // Save script URL when it changes
+        document.getElementById('scriptUrl').addEventListener('input', function() {
+            localStorage.setItem('chaiTrackerScriptUrl', this.value);
+        });
+
+        function toggleSetup() {
+            const setup = document.getElementById('setupSection');
+            setup.classList.toggle('hidden');
+        }
+
+        function toggleOtherMed() {
+            const select = document.getElementById('medicationName');
+            const otherField = document.getElementById('otherMedField');
+            otherField.classList.toggle('hidden', select.value !== 'Other');
+        }
+
+        function showView(view) {
+            // Hide all views
+            ['menuView', 'foodView', 'snackView', 'medicationView', 'poopView', 'vomitView', 'observationView'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            // Show selected view
+            document.getElementById(view + 'View').classList.remove('hidden');
+            // Hide status message when changing views
+            document.getElementById('statusMessage').classList.add('hidden');
+        }
+
+        function showStatus(type, message) {
+            const status = document.getElementById('statusMessage');
+            status.className = 'status ' + type;
+            status.textContent = message;
+            status.classList.remove('hidden');
+        }
+
+        function fillPrevious(section) {
+            if (!lastEntry) return;
+            
+            if (section === 'food') {
+                document.getElementById('foodTime').value = lastEntry.foodTime || '';
+                document.getElementById('foodIngredients').value = lastEntry.foodIngredients || '';
+                document.getElementById('foodBrand').value = lastEntry.foodBrand || '';
+                document.getElementById('foodAmount').value = lastEntry.foodAmount || '';
+                document.getElementById('foodProbiotic').value = lastEntry.foodProbiotic || '';
+            } else if (section === 'snack') {
+                document.getElementById('snackTime').value = lastEntry.snackTime || '';
+                document.getElementById('snackIngredients').value = lastEntry.snackIngredients || '';
+                document.getElementById('snackBrand').value = lastEntry.snackBrand || '';
+                document.getElementById('snackAmount').value = lastEntry.snackAmount || '';
+            } else if (section === 'medication') {
+                document.getElementById('medicationTime').value = lastEntry.medicationTime || '';
+                document.getElementById('medicationName').value = lastEntry.medicationName || '';
+                document.getElementById('medicationAmount').value = lastEntry.medicationAmount || '';
+                toggleOtherMed();
+            } else if (section === 'poop') {
+                document.getElementById('poopTime').value = lastEntry.poopTime || '';
+                document.getElementById('poopAmount').value = lastEntry.poopAmount || '';
+                document.getElementById('poopConsistency').value = lastEntry.poopConsistency || '';
+            }
+        }
+
+        async function submitEntry(type) {
+            const scriptUrl = document.getElementById('scriptUrl').value;
+            const enteredBy = document.getElementById('enteredBy').value;
+
+            if (!scriptUrl) {
+                showStatus('error', 'Please configure your Google Sheets URL first.');
+                toggleSetup();
+                return;
+            }
+
+            if (!enteredBy) {
+                showStatus('error', 'Please select who is making this entry.');
+                return;
+            }
+
+            const data = {
+                entryDate: document.getElementById('entryDate').value,
+                enteredBy: enteredBy,
+                foodTime: document.getElementById('foodTime')?.value || '',
+                foodIngredients: document.getElementById('foodIngredients')?.value || '',
+                foodBrand: document.getElementById('foodBrand')?.value || '',
+                foodAmount: document.getElementById('foodAmount')?.value || '',
+                foodProbiotic: document.getElementById('foodProbiotic')?.value || '',
+                snackTime: document.getElementById('snackTime')?.value || '',
+                snackIngredients: document.getElementById('snackIngredients')?.value || '',
+                snackBrand: document.getElementById('snackBrand')?.value || '',
+                snackAmount: document.getElementById('snackAmount')?.value || '',
+                medicationTime: document.getElementById('medicationTime')?.value || '',
+                medicationName: document.getElementById('medicationName')?.value === 'Other' 
+                    ? document.getElementById('medicationOther')?.value || ''
+                    : document.getElementById('medicationName')?.value || '',
+                medicationAmount: document.getElementById('medicationAmount')?.value || '',
+                poopTime: document.getElementById('poopTime')?.value || '',
+                poopAmount: document.getElementById('poopAmount')?.value || '',
+                poopConsistency: document.getElementById('poopConsistency')?.value || '',
+                vomit: document.querySelector('input[name="vomit"]:checked')?.value || '',
+                observations: document.getElementById('observations')?.value || ''
+            };
+
+            try {
+                // Create a hidden form and submit it
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = scriptUrl;
+                form.target = 'hiddenFrame';
+                form.style.display = 'none';
+
+                // Add all data as form fields
+                Object.keys(data).forEach(key => {
+                    const input = document.createElement('input');
+                    input.name = key;
+                    input.value = data[key];
+                    form.appendChild(input);
+                });
+
+                // Create hidden iframe if it doesn't exist
+                let iframe = document.getElementById('hiddenFrame');
+                if (!iframe) {
+                    iframe = document.createElement('iframe');
+                    iframe.id = 'hiddenFrame';
+                    iframe.name = 'hiddenFrame';
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+
+                // Save last entry
+                lastEntry = data;
+                
+                // Show fill previous buttons
+                ['fillPrevFood', 'fillPrevSnack', 'fillPrevMedication', 'fillPrevPoop'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) btn.style.display = 'block';
+                });
+
+                showStatus('success', type.charAt(0).toUpperCase() + type.slice(1) + ' entry logged successfully for Chai!');
+
+                // Clear form fields for this section
+                if (type === 'food') {
+                    ['foodTime', 'foodIngredients', 'foodBrand', 'foodAmount', 'foodProbiotic'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = '';
+                    });
+                } else if (type === 'snack') {
+                    ['snackTime', 'snackIngredients', 'snackBrand', 'snackAmount'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = '';
+                    });
+                } else if (type === 'medication') {
+                    ['medicationTime', 'medicationName', 'medicationAmount', 'medicationOther'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = '';
+                    });
+                    toggleOtherMed();
+                } else if (type === 'poop') {
+                    ['poopTime', 'poopAmount', 'poopConsistency'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = '';
+                    });
+                } else if (type === 'vomit') {
+                    document.querySelectorAll('input[name="vomit"]').forEach(radio => radio.checked = false);
+                } else if (type === 'observation') {
+                    document.getElementById('observations').value = '';
+                }
+
+                setTimeout(() => showView('menu'), 1500);
+            } catch (error) {
+                showStatus('error', 'Error submitting entry: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
